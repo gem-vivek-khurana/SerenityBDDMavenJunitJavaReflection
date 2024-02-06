@@ -14,10 +14,6 @@ public class LoginStepDefinitions {
     /**
      * Step definition for launching the browser and opening a login page.
      *
-     * @param page The name of the login page. The name of the page object class for this step-definition should be
-     *             "<Page>Login.java" and a method should be available in the {@link NavigateTo} class with the name
-     *             "the<Page>LoginPage()" which should be navigating to the {@link net.thucydides.core.annotations.DefaultUrl}
-     *             of Serenity library by using pageObject.open() method.
      * @throws NoSuchMethodException    If a matching method is not found.
      * @throws InvocationTargetException If the invoked method throws an exception.
      * @throws IllegalAccessException    If there's an issue accessing the method.
@@ -28,10 +24,10 @@ public class LoginStepDefinitions {
      * }</pre>
      * </p>
      */
-    @Given("I launch the browser and open the {string} login page")
-    public void launchBrowserAndOpenTheLogin(String page) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    @Given("I launch the browser and open the home page")
+    public void launchBrowserAndOpenTheHomePage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         System.setProperty("webdriver.http.factory", "jdk-http-client");
-        NavigateTo.class.getMethod("the" + page + "LoginPage").invoke(new NavigateTo());
+        NavigateTo.class.getMethod("theHomePage").invoke(new NavigateTo());
     }
 
     /**
