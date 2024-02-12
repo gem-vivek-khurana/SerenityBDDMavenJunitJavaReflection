@@ -1,12 +1,15 @@
 package com.SerenityBDD.navigation;
 
-import com.SerenityBDD.pages.GoogleHome;
+import com.SerenityBDD.pages.google.GoogleHome;
+import com.microsoft.playwright.Page;
+import net.serenitybdd.core.Serenity;
+import net.thucydides.core.annotations.DefaultUrl;
 
 public class NavigateTo {
-    final GoogleHome googleHome = new GoogleHome();
+    Page page = Serenity.sessionVariableCalled("page");
 
     public void theHomePage() {
-        googleHome.open();
+        page.navigate(GoogleHome.class.getAnnotation(DefaultUrl.class).value());
     }
 
 }

@@ -3,6 +3,7 @@ package com.SerenityBDD.steps;
 import com.SerenityBDD.execute.Perform;
 import com.SerenityBDD.support.DataObjectOperations;
 import com.SerenityBDD.support.PageObjectOperations;
+import com.microsoft.playwright.Page;
 import io.cucumber.java.en.Then;
 import net.serenitybdd.core.Serenity;
 import net.thucydides.core.annotations.Steps;
@@ -51,7 +52,9 @@ public class FieldStateVerificationStepDefinitions {
         String currentPage = Serenity.sessionVariableCalled("Current Page");
         Class<?> pageClass = pageObjectOperations.getPageClass(currentPage);
         Field field = pageObjectOperations.poeFieldClass(poe, currentPage);
-        expectedCount = expectedCount.contains("$") ? dataObjectOperations.transformDataValue(expectedCount) : expectedCount;
-        Assert.assertEquals(Integer.parseInt(expectedCount), perform.getWebElements(field, pageClass).size());
+        expectedCount = expectedCount.contains("$") ? dataObjectOperations
+                .transformDataValue(expectedCount) : expectedCount;
+        Assert.assertEquals(Integer.parseInt(expectedCount),
+                perform.getElementHandles(perform.fieldToInteract(field, pageClass)).size());
     }
 }

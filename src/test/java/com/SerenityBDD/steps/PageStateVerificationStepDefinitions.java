@@ -21,7 +21,6 @@ public class PageStateVerificationStepDefinitions {
      * @param page     The name of the page.
      * @param workflow The name of the workflow.
      * @throws IllegalAccessException If there's an issue accessing page-related fields.
-     *
      * Example usage:
      * <pre>{@code
      * Then I should be on the "Home" page of the "Main" workflow
@@ -35,6 +34,7 @@ public class PageStateVerificationStepDefinitions {
         Class<?> pageClass = pageObjectOperations.getPageClass(page, workflow);
         Field field = pageObjectOperations.poeFieldClass("PAGE_LOADED", page, workflow);
         verifyStateOf.theVisibilityOf(field, pageClass);
+        verifyStateOf.visibilityOfElementInViewPort(field, pageClass);
         Serenity.setSessionVariable("Current Page").to(pageObjectOperations.pageObjectName(workflow)
                 .toLowerCase() + "." + pageObjectOperations.pageObjectName(page));
     }
@@ -45,7 +45,6 @@ public class PageStateVerificationStepDefinitions {
      * @param section  The name of the section.
      * @param workflow The name of the workflow.
      * @throws IllegalAccessException If there's an issue accessing section-related fields.
-     *
      * Example usage:
      * <pre>{@code
      * When I focus on the "Header" section of the "Main" workflow
@@ -66,7 +65,6 @@ public class PageStateVerificationStepDefinitions {
      * @param grid     The name of the grid.
      * @param workflow The name of the workflow.
      * @throws IllegalAccessException If there's an issue accessing grid-related fields.
-     *
      * Example usage:
      * <pre>{@code
      * When I focus on the "Data Grid" grid under the "Main" workflow
@@ -108,7 +106,6 @@ public class PageStateVerificationStepDefinitions {
      * @param page     The name of the page.
      * @param workflow The name of the workflow.
      * @throws IllegalAccessException If there's an issue accessing tab-related fields.
-     *
      * Example usage:
      * <pre>{@code
      * Then I should be on the "Overview" tab of the "Dashboard" page of the "Main" workflow

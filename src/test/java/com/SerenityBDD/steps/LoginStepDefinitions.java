@@ -1,8 +1,10 @@
 package com.SerenityBDD.steps;
 
 import com.SerenityBDD.navigation.NavigateTo;
+import com.SerenityBDD.support.BrowserObjectOperations;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
+import net.thucydides.core.annotations.Steps;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LoggingEventBuilder;
 
@@ -26,7 +28,6 @@ public class LoginStepDefinitions {
      */
     @Given("I launch the browser and open the home page")
     public void launchBrowserAndOpenTheHomePage() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        System.setProperty("webdriver.http.factory", "jdk-http-client");
         NavigateTo.class.getMethod("theHomePage").invoke(new NavigateTo());
     }
 

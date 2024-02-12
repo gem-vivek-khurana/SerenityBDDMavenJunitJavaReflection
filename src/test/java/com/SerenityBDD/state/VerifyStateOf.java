@@ -1,12 +1,17 @@
 package com.SerenityBDD.state;
 
+import com.microsoft.playwright.ElementHandle;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.WaitForSelectorState;
+import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.pages.PageObject;
-import org.openqa.selenium.*;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VerifyStateOf extends PageObject {
+    final Page page = Serenity.sessionVariableCalled("page");
 
     /**
      * Wait for the visibility of a web element identified by a field and page class.
@@ -16,40 +21,31 @@ public class VerifyStateOf extends PageObject {
      * @throws IllegalAccessException If there is an issue accessing the field.
      */
     public void theVisibilityOf(Field field, Class<?> pageClass) throws IllegalAccessException {
-        By elementForVisibility = (By) field.get(pageClass);
+        String elementForVisibility = (String) field.get(pageClass);
         theVisibilityOf(elementForVisibility);
     }
 
     /**
      * Wait for the visibility of a web element identified by a locator.
      *
-     * @param byField The locator of the element.
+     * @param field The locator of the element in CssSelector or xPath format.
      */
-    public void theVisibilityOf(By byField) {
-        waitForCondition().until(ExpectedConditions.visibilityOfElementLocated(byField));
-    }
-
-    /**
-     * Wait for the visibility of a web element.
-     *
-     * @param element The web element to wait for.
-     */
-    public void theVisibilityOf(WebElement element) {
-        waitForCondition().until(ExpectedConditions.visibilityOf(element));
+    public void theVisibilityOf(String field) {
+        try {
+            page.waitForSelector(field);
+        } catch (Exception e) {
+            throw new RuntimeException("Element " + field + " is not visible due to: " + e);
+        }
     }
 
     /**
      * Check if a web element identified by a locator is visible on the page.
      *
-     * @param byField The locator of the element.
+     * @param field The locator of the element.
      * @return True if the element is visible, false otherwise.
      */
-    public boolean elementIsVisible(By byField) {
-        try {
-            return getDriver().findElement(byField).isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+    public boolean elementIsVisible(String field) {
+        return page.isVisible(field);
     }
 
     /**
@@ -60,54 +56,46 @@ public class VerifyStateOf extends PageObject {
      * @throws IllegalAccessException If there is an issue accessing the field.
      */
     public void thePresenceOf(Field field, Class<?> pageClass) throws IllegalAccessException {
-        By elementForAvailability = (By) field.get(pageClass);
+        String elementForAvailability = (String) field.get(pageClass);
         thePresenceOf(elementForAvailability);
     }
 
     /**
      * Wait for the presence of a web element identified by a locator.
      *
-     * @param byField The locator of the element.
+     * @param field The locator of the element in String format of CssSelector or xPath.
      */
-    public void thePresenceOf(By byField) {
-        waitForCondition().until(ExpectedConditions.presenceOfElementLocated(byField));
+    public void thePresenceOf(String field) {
+        page.waitForSelector(field);
     }
 
-    /**
-     * Check if a web element identified by a locator is present on the page.
-     *
-     * @param byField The locator of the element.
-     * @return True if the element is present, false otherwise.
-     */
-    public boolean elementIsPresent(By byField) {
-        try {
-            return getDriver().findElements(byField).size() > 0;
-        } catch (NoSuchElementException e) {
-            return false;
-        }
+    public boolean visibilityOfElementInViewPort(Field field, Class<?> pageClass) throws IllegalAccessException {
+        return visibilityOfElementInViewPort((String) field.get(pageClass));
     }
 
     /**
      * Check if a web element is visible within the viewport.
      *
-     * @param element The web element to check.
+     * @param field The selector to be checked for visibility in viewport.
      * @return True if the element is visible in the viewport, false otherwise.
      */
-    public boolean visibilityOfElementInViewPort(WebElement element) {
-        WebDriver driver = getDriver();
+    public boolean visibilityOfElementInViewPort(String field) {
+        ElementHandle element = page.querySelector(field);
+        Map<String, ElementHandle> arg = new HashMap<>();
+        arg.put("element", element);
 
-        return (Boolean) ((JavascriptExecutor) driver).executeScript(
-                "var elem = arguments[0],                 " +
-                        "  box = elem.getBoundingClientRect(),    " +
-                        "  cx = box.left + box.width / 2,         " +
-                        "  cy = box.top + box.height / 2,         " +
-                        "  e = document.elementFromPoint(cx, cy); " +
-                        "for (; e; e = e.parentElement) {         " +
-                        "  if (e === elem)                        " +
-                        "    return true;                         " +
-                        "}                                        " +
-                        "return false;                            "
-                , element);
+        String script = "({ element }) => {\n" +
+                "  const rect = element.getBoundingClientRect();\n" +
+                "  return (\n" +
+                "    rect.top >= 0 &&\n" +
+                "    rect.left >= 0 &&\n" +
+                "    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&\n" +
+                "    rect.right <= (window.innerWidth || document.documentElement.clientWidth)\n" +
+                "  );\n" +
+                "}";
+
+        return (boolean) page.evaluate(script, arg);
+
     }
 
     /**
@@ -117,9 +105,9 @@ public class VerifyStateOf extends PageObject {
      * @param pageClass The class of the page where the element is located.
      */
     public void theInvisibilityOf(Field field, Class<?> pageClass) {
-        By elementForInvisibility;
+        String elementForInvisibility;
         try {
-            elementForInvisibility = (By) field.get(pageClass);
+            elementForInvisibility = (String) field.get(pageClass);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
@@ -129,23 +117,22 @@ public class VerifyStateOf extends PageObject {
     /**
      * Wait for the invisibility of a web element identified by a locator.
      *
-     * @param byField The locator of the element.
+     * @param field The locator of the element.
      */
-    public void theInvisibilityOf(By byField) {
-        waitForCondition().until(ExpectedConditions.invisibilityOfElementLocated(byField));
+    public void theInvisibilityOf(String field) {
+        page.waitForSelector(field, new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
     }
 
     /**
-     * Check if a checkbox WebElement is selected.
+     * Check if a checkbox ElementHandle is selected.
      *
-     * @param checkbox The checkbox WebElement to check.
+     * @param checkbox The checkbox ElementHandle to check.
      * @return True if the checkbox is selected, false otherwise.
      */
-    public boolean checkboxIsSelected(WebElement checkbox) {
-        if (checkbox.getTagName().contains("input")) {
-            return checkbox.isSelected();
+    public boolean checkboxIsSelected(ElementHandle checkbox) {
+        if (page.evaluate("e => e.tagName", checkbox).toString().contains("input")) {
+            return checkbox.isChecked();
         }
-        return checkbox.findElement(By.className("mat-checkbox-input"))
-                .getAttribute("aria-checked").equals("true");
+        return checkbox.querySelector("mat-checkbox-input").getAttribute("aria-checked").equals("true");
     }
 }
