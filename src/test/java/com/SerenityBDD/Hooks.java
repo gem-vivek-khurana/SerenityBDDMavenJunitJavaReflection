@@ -13,6 +13,8 @@ public class Hooks extends PageObject {
     @Before
     public static void before(Scenario s) {
         page = browserObjectOperations.createPlaywrightPageInstance(BrowserObjectOperations.SupportedBrowsers.CHROME);
+        // Set the viewport size to the maximum screen size
+        page.setViewportSize(1920, 1080);
         Serenity.setSessionVariable("page").to(page);
     }
 

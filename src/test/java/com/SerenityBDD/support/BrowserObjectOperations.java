@@ -6,16 +6,13 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import lombok.Getter;
 
+import java.util.ArrayList;
+
 public class BrowserObjectOperations {
     public Page createPlaywrightPageInstance(SupportedBrowsers supportedBrowser) {
         String browserName = supportedBrowser.getBrowser();
         Browser browser;
         BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions();
-//        try (Playwright playwright = Playwright.create()) {
-//
-//        } catch (RuntimeException e) {
-//            throw new RuntimeException(e);
-//        }
         switch (browserName) {
             case "firefox" -> browser = Playwright.create().firefox().launch(launchOptions.setHeadless(false));
             case "chromium" ->

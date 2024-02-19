@@ -7,6 +7,7 @@ import com.microsoft.playwright.ElementHandle;
 import com.microsoft.playwright.Page;
 import net.serenitybdd.core.Serenity;
 import net.serenitybdd.core.pages.PageObject;
+import com.SerenityBDD.pages.gemfin.dialogs.Calendar;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LoggingEventBuilder;
 
@@ -490,6 +491,77 @@ public class Perform extends PageObject {
         page.close();
     }
 
+    public void settingAngularDropdownAs(Field angularDropdownElement, Class<?> pageClass, String value) {
+        String fieldToSelect = fieldToInteract(angularDropdownElement, pageClass);
+        page.waitForSelector(fieldToSelect);
+        settingAngularDropdownAs(fieldToSelect, value);
+    }
+
+    public void settingAngularDropdownAs(String field, String value) {
+        clickOn(field);
+        page.waitForSelector("div[role='listbox']");
+        List<ElementHandle> options = getElementHandles("mat-option[role='option'] span");
+        boolean valueFound = false;
+        for (ElementHandle option : options) {
+            if (option.innerText().equalsIgnoreCase(value)) {
+                valueFound = true;
+                option.click();
+                break;
+            }
+        }
+        if (!valueFound) {
+            throw new RuntimeException("Unable to find the value: " + value + "in the angular dropdown.");
+        }
+    }
+
+    public void settingDateOnCalendar(String dateToSet) {
+        Calendar calendar = new Calendar();
+        String[] distribution = dateToSet.split(" ");
+        String currentMonthYearOnCalendar = gettingFieldValue(Calendar.MONTH_YEAR);
+        if (!currentMonthYearOnCalendar.equalsIgnoreCase(distribution[0].substring(0, 3) + " " + distribution[2])) {
+            clickOn(Calendar.MONTH_YEAR_ARROW);
+            calendar.setYear(distribution[2]);
+            calendar.setMonth(distribution[0]);
+        }
+        calendar.setDate(distribution[1].replace(",", ""));
+    }
+
+    public void sendingSpecialKeys(Field field, Class<?> pageClass, String value) {
+        String fieldToFill = fieldToInteract(field, pageClass);
+        page.waitForSelector(fieldToFill);
+        sendingSpecialKeys(fieldToFill, value);
+    }
+
+    public void sendingSpecialKeys(String byField, String value) {
+        ElementHandle element = getElementHandle(byField);
+        sendingSpecialKeys(element, value);
+    }
+
+    public void sendingSpecialKeys(ElementHandle element, String value) {
+        element.press(value);
+    }
+
+    public ElementHandle getElementHandle(String byField) {
+        return page.querySelector(byField);
+    }
+
+    public void scrollingToTheBottomOfThePage() {
+        page.evaluate("window.scrollTo(0, 360)");
+    }
+
+    public void scrollingToTheMiddleOfThePage() {
+        page.evaluate("window.scrollTo(0, 180)");
+    }
+
+    public String gettingAttribute(String byField, String attributeName) {
+        ElementHandle fieldElement = getElementHandle(byField);
+        return gettingAttribute(fieldElement, attributeName);
+    }
+
+    public String gettingAttribute(ElementHandle fieldElement, String attributeName) {
+        return fieldElement.getAttribute(attributeName);
+    }
+
     /**
      * An enumeration representing different window handle classification types.
      */
@@ -551,5 +623,4 @@ public class Perform extends PageObject {
             };
         }
     }
-
 }

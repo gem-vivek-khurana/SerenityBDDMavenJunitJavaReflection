@@ -1,9 +1,9 @@
 package com.SerenityBDD.steps;
 
 import com.SerenityBDD.execute.Perform;
+import com.SerenityBDD.state.VerifyStateOf;
 import com.SerenityBDD.support.DataObjectOperations;
 import com.SerenityBDD.support.PageObjectOperations;
-import com.microsoft.playwright.Page;
 import io.cucumber.java.en.Then;
 import net.serenitybdd.core.Serenity;
 import net.thucydides.core.annotations.Steps;
@@ -22,6 +22,9 @@ public class FieldStateVerificationStepDefinitions {
 
     @Steps
     DataObjectOperations dataObjectOperations;
+
+    @Steps
+    VerifyStateOf verifyStateOf;
 
     @Then("I should see the {string} field/button/link/label is {string}")
     public void iShouldSeeTheFieldIs(String fieldName, String fieldState) {
@@ -56,5 +59,15 @@ public class FieldStateVerificationStepDefinitions {
                 .transformDataValue(expectedCount) : expectedCount;
         Assert.assertEquals(Integer.parseInt(expectedCount),
                 perform.getElementHandles(perform.fieldToInteract(field, pageClass)).size());
+    }
+
+    @Then("I should see {string} notification with message {string}")
+    public void iShouldSeeNotificationWithMessage(String notificationType, String message) {
+        String toaster = ".ngx-toastr";
+        verifyStateOf.theVisibilityOf(toaster);
+        Assert.assertTrue(perform.gettingAttribute(toaster, "class").toLowerCase().contains(notificationType.toLowerCase()));
+        String alertContext = "div[role='alert']";
+        Assert.assertTrue(verifyStateOf.elementIsVisible(alertContext));
+        Assert.assertEquals(perform.gettingFieldValue(alertContext), message);
     }
 }

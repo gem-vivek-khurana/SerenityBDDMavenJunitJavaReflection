@@ -9,6 +9,6 @@ import org.junit.runner.RunWith;
         plugin={"pretty"},
         features="src/test/resources/features",
         glue="com.SerenityBDD",
-        tags = "not @ignore"
+        tags = "@run and not @ignore"
 )
 public class SanitySuiteTest { }

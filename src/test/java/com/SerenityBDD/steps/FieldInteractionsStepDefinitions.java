@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.SerenityBDD.support.DataObjectOperations.DateTimeFormatters.MONTH_DATE;
+
 public class FieldInteractionsStepDefinitions {
     @Steps
     Perform perform;
@@ -83,7 +85,7 @@ public class FieldInteractionsStepDefinitions {
             throw new RuntimeException("The data table with this step is incorrect. Please make sure that the table" +
                     " the right headers: [field, fieldType, value]");
         for (Map<String, String> tableRow : dataTable) {
-            String valueToFill = "";
+            String valueToFill;
             if (tableRow.get("value").contains("`$`")) {
                 valueToFill = tableRow.get("value");
             } else {
@@ -98,5 +100,29 @@ public class FieldInteractionsStepDefinitions {
                 default -> throw new IllegalArgumentException("Unknown field type: " + tableRow.get("fieldType"));
             }
         }
+    }
+
+    @When("I set the {string} angular dropdown as {string}")
+    public void iSetTheAngularDropdownAs(String fieldName, String value) {
+        String poe = pageObjectOperations.poeName(fieldName);
+        String currentPage = Serenity.sessionVariableCalled("Current Page");
+        Class<?> pageClass = pageObjectOperations.getPageClass(currentPage);
+        Field angularDropdownElement = pageObjectOperations.poeFieldClass(poe, currentPage);
+        perform.settingAngularDropdownAs(angularDropdownElement, pageClass, value);
+    }
+
+    @When("I send {string} key for {string} field")
+    public void iSendKeyForField(String key, String field) {
+        String poe = pageObjectOperations.poeName(field);
+        String currentPage = Serenity.sessionVariableCalled("Current Page");
+        Class<?> pageClass = pageObjectOperations.getPageClass(currentPage);
+        Field elementForKeySend = pageObjectOperations.poeFieldClass(poe, currentPage);
+        perform.sendingSpecialKeys(elementForKeySend, pageClass, key);
+    }
+
+    @When("I set the date on the calendar as {string}")
+    public void iSetTheDateOnTheCalendarAs(String dateToSet) {
+        dateToSet = dataObjectOperations.transformDateValue(dateToSet, MONTH_DATE.getDtf());
+        perform.settingDateOnCalendar(dateToSet);
     }
 }

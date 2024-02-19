@@ -43,4 +43,9 @@ public class BrowserHandlingStepDefinitions {
     public void iCloseTheWindowTitledAs(String pageTitle) {
         perform.closingWindow(Perform.WindowHandleClassificationType.TITLE_MATCH, pageTitle);
     }
+
+    @When("I wait {int} seconds for delayed page load")
+    public void iWaitSecondsForDelayedPageLoad(int timeInSeconds) throws InterruptedException {
+        Thread.sleep(timeInSeconds*1000);
+    }
 }

@@ -92,7 +92,7 @@ public class PageStateVerificationStepDefinitions {
      */
     @Then("I should be on the {string} dialog under the {string} workflow")
     public void iShouldBeOnTheDialogUnderTheWorkflow(String dialog, String workflow) throws IllegalAccessException {
-        Class<?> dialogClass = pageObjectOperations.getPageClass(dialog, workflow);
+        Class<?> dialogClass = pageObjectOperations.getDialogClass(dialog, workflow);
         Field field = pageObjectOperations.poeDialogClass("DIALOG_LOADED", dialog, workflow);
         verifyStateOf.theVisibilityOf(field, dialogClass);
         Serenity.setSessionVariable("Current Page").to(pageObjectOperations.pageObjectName(workflow)
@@ -119,5 +119,10 @@ public class PageStateVerificationStepDefinitions {
         Serenity.setSessionVariable("Current Page").to(pageObjectOperations.pageObjectName(workflow)
                 .toLowerCase() + ".tabs." + pageObjectOperations.pageObjectName(page) + "." +
                 pageObjectOperations.pageObjectName(tab));
+    }
+
+    @When("I focus on the {string} dialog under the {string} workflow")
+    public void iFocusOnTheDialogUnderTheWorkflow(String dialog, String workflow) throws IllegalAccessException {
+        iShouldBeOnTheDialogUnderTheWorkflow(dialog, workflow);
     }
 }
