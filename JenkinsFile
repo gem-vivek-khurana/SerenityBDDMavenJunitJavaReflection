@@ -1,7 +1,7 @@
 pipeline {
     agent any
 tools{
-jdk 'JDK 1.17'
+jdk 'JDK 17'
 }
     environment {
         // Define any environment variables needed for your pipeline
