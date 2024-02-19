@@ -17,8 +17,6 @@
         <serenity.version>3.9.8</serenity.version>
         <serenity.cucumber.version>3.9.8</serenity.cucumber.version>
         <cucumber.version>7.13.0</cucumber.version>
-       <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
     </properties>
     <repositories>
         <repository>
