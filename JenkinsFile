@@ -1,30 +1,47 @@
 pipeline {
     agent any
-
+tools{
+jdk 'JDK 17'
+}
+    environment {
+        // Define any environment variables needed for your pipeline
+        SERENITY_BRANCH = 'conversion-to-playwright'
+    }
+ 
     stages {
-        stage('SCM') {
+        stage('Checkout') {
             steps {
-                git branch: '*/conversion-to-playwright',
-                    credentialsId: 'admingithub',
-                    url: 'git@github.com/gem-vivek-khurana/SerenityBDDMavenJunitJavaReflection.git',
-                    poll: false
-            }
-        }
-
-        stage('Maven_Build') {
-            agent {
-                label 'maven_runner_java11'
-            }
-            steps {
-                container('maven-runner-11') {
-                    dir('rpasrer_testing') {
-                        script {
-                            sh 'rm -rf target'
-                            sh 'mvn clean test'
-                        }
-                    }
+                // Checkout the specified branch from your version control system (e.g., Git)
+                script {
+                    checkout([$class: 'GitSCM', branches: [[name: "*/$SERENITY_BRANCH"]], userRemoteConfigs: [[url: 'https://github.com/gem-vivek-khurana/SerenityBDDMavenJunitJavaReflection.git']]])
                 }
             }
+        }
+        stage('Build') {
+            steps {
+                // Perform any build steps needed for your Serenity project (e.g., Maven or Gradle commands)
+                sh 'mvn clean test'
+            }
+        }
+ 
+        stage('Publish Report') {
+            steps {
+                // Publish Serenity report
+                // You may need to adjust this step based on how your Serenity reports are generated and published
+                // For example, if your Serenity reports are in target/site/serenity, you can use the following:
+                publishHTML(target: [allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true, reportDir: 'target/site/serenity', reportFiles: 'index.html', reportName: 'Serenity Report'])
+            }
+        }
+    }
+    post {
+        always {
+            // Send email notification with the Serenity report attached
+            emailext (
+                subject: "Serenity Report for ${env.BUILD_NUMBER}",
+                body: "Serenity Report is attached.",
+                to: "vivek.khurana@geminisolutions.com",
+                attachmentsPattern: 'target/site/serenity/**/*.html'
+            )
         }
     }
 }
